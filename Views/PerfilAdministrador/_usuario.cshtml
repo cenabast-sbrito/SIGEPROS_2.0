@@ -1,0 +1,207 @@
+﻿<style>
+
+    .row-equal {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: stretch;
+    }
+
+        .row-equal > [class*='col-'] {
+            display: flex;
+        }
+
+        .row-equal .tabla-card {
+            width: 100%;
+        }
+
+    .roles-container {
+        max-height: 280px;
+        overflow-y: auto;
+    }
+
+
+</style>
+
+<script>
+
+    document.addEventListener("DOMContentLoaded", () => {
+        $('#href_usuarios').on('shown.bs.tab', function () {
+            try {
+
+                _ocultarImagen();
+
+            } catch (err) {
+                console.error("Error al inicializar carga de usuarios:", err);
+            }
+        });
+    });
+
+</script>
+
+
+<div class="tabla-card">
+
+    <h4 class="section-title">
+        <i class="fa fa-user"></i>
+        Mantenedor de Usuarios
+    </h4>
+
+    <div class="form-group">
+
+
+
+
+
+        <div class="row mb-3">
+            <div class="col-md-12 text-end">
+                <button id="btnNuevoUsuario"
+                        type="button"
+                        class="btn btn-success"
+                        data-bs-toggle="modal"
+                        data-bs-target="#modalNuevoUsuario">
+                    <i class="fas fa-plus"></i> Nuevo Usuario
+                </button>
+            </div>
+        </div>
+        <table id="tableroUsuario"
+               class="table table-hover table-bordered table-striped table-datatable-app"
+               width="100%">
+
+            <thead class="thead-app">
+            </thead>
+            <tbody></tbody>
+
+        </table>
+
+
+
+
+
+
+
+    </div>
+
+
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- Modal: Crear/Editar un nuevo usuario -->
+
+<div class="modal fade" id="modalNuevoUsuario" 
+     data-bs-backdrop="static"
+     data-bs-keyboard="false"
+     tabindex="-1" role="dialog" 
+     aria-labelledby="modalUsuarioLabel" 
+     aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+
+            <!-- Cabecera del Modal -->
+            <div class="modal-header">
+                <div class="titulo-modal">
+                    <h2 class="mb-0">Usuario</h2>
+                </div>
+                <button type="button"
+                        class="btn-close btn-close-white"
+                        data-bs-dismiss="modal"
+                        aria-label="Cerrar">
+                </button>
+            </div>
+
+            <!-- Formulario -->
+            <form id="formUsuario">
+
+                <div class="tabla-card">
+
+                    <h4 class="section-title">
+                        <i class="fa fa-user"></i>
+                        Datos del Usuario
+                    </h4>
+
+                    <div class="form-group">
+                        <label for="new_organismo" class="label-formulario">ORGANISMO</label>
+                        <select id="new_organismo" name="new_organismo" class="form-control" required>
+                            <option value=""></option>
+                            <option value="CENABAST">CENABAST</option>
+                            <option value="MINSAL">MINSAL</option>
+                        </select>
+
+                    </div>
+                    <div class="form-group">
+                        <label for="new_rut" class="label-formulario">RUT</label>
+                        <input id="new_rut" name="new_rut" type="text" class="form-control" placeholder="Sin puntos, sin guión y sin dígito verificador" required autocomplete="off">
+                    </div>
+                    <div class="form-group">
+                        <label for="new_nombre" class="label-formulario">Nombres</label>
+                        <input id="new_nombre" name="new_nombre" type="text" class="form-control" placeholder="Nombres" required autocomplete="off">
+                    </div>
+                    <div class="form-group">
+                        <label for="new_apellido" class="label-formulario">Apellido</label>
+                        <input id="new_apellido" name="new_apellido" type="text" class="form-control" placeholder="Apellidos" required autocomplete="off">
+                    </div>
+                    <div class="form-group">
+                        <label for="new_usuarioLDAP" class="label-formulario">Usuario LDAP</label>
+                        <input id="new_usuarioLDAP" name="new_usuarioLDAP" type="text" class="form-control" placeholder="Usuario LDAP" autocomplete="off">
+                    </div>
+                    <div class="form-group">
+                        <label for="new_usuario_clave" class="label-formulario">Contraseña</label>
+                        <input id="new_usuario_clave" name="new_usuario_clave" type="text" class="form-control" placeholder="Ingrese contraseña" autocomplete="new-password">
+                    </div>
+                    <div class="form-group">
+                        <label for="new_usuario_estado" class="label-formulario">Estado</label>
+                        <select id="new_usuario_estado" name="new_usuario_estado" class="form-control" required>
+                            <option value="1">ACTIVO</option>
+                            <option value="0">INACTIVO</option>
+                        </select>
+                    </div>
+
+                </div>
+
+                <!-- Pie del Modal -->
+                <div class="modal-footer">
+
+                    <button id="guardarNuevoUsuario" type="button" class="btn btn-primary">Guardar  </button>
+                    <button id="modificarUsuario" type="button" class="btn btn-primary">Modificar</button>
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Cerrar</button>
+
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+

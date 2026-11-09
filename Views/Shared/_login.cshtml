@@ -1,0 +1,96 @@
+﻿@model FuncionarioModel
+
+@{
+    ViewData["Title"] = "Inicio Sesión";
+    var msjeError = TempData["MensajeError"]?.ToString();
+}
+
+<div class="container align-items-center my-1">
+    <div class="row justify-content-center">
+        <form id="formLogin" asp-controller="Home" asp-action="AutenticarLDAP" method="post" class="col-xxl-5 col-xl-5 col-lg-5 col-md-5 col-sm-12 col-xs-12 rounded-3 p-5 bg-white elevation-02">
+            
+            <div class="row">
+                <img src="~/images/logo.png" style="width:140px" class="mx-auto px-1" />
+            </div>
+
+            <div class="row justify-content-center pt-4 pb-2">
+                <h5 class="fw-bold text-title lh-1 mb-3 text-center">Iniciar Sesión</h5>
+            </div>
+
+            <!-- Selector de Tipo de Ingreso -->
+            <div class="mb-3 d-flex justify-content-center gap-2">
+                <div class="btn-group w-100" role="group">
+                    <input type="radio" class="btn-check" name="tipoLogin" id="loginLDAP" autocomplete="off" checked onclick="cambiarTipoLogin('LDAP')">
+                    <label class="btn btn-outline-primary" for="loginLDAP">Usuario Windows (LDAP)</label>
+
+                    <input type="radio" class="btn-check" name="tipoLogin" id="loginRUT" autocomplete="off" onclick="cambiarTipoLogin('RUT')">
+                    <label class="btn btn-outline-primary" for="loginRUT">RUT</label>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label id="lblUsuario" asp-for="nombre_usuario" class="form-label text-title fw-bold ps-2">Usuario Windows</label>
+                <input asp-for="nombre_usuario" id="inputUsuario" class="form-control" placeholder="Ingrese su usuario Windows" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Usuario Windows. Ej: napellido" />
+                <span asp-validation-for="nombre_usuario" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="nombre_programa" class="form-label text-title fw-bold ps-2"></label>
+                <select asp-for="nombre_programa"
+                        class="form-select"
+                        data-bs-toggle="tooltip"
+                        data-bs-placement="top"
+                        data-bs-title="Seleccione el programa">
+                    <option value="">Seleccione...</option>
+                    <option value="0">PNAC-PACAM</option>
+                    <option value="1">PNI</option>
+                </select>
+                <span asp-validation-for="nombre_programa" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="password" class="form-label text-title fw-bold ps-2"></label>
+                <input type="password" asp-for="password" class="form-control" />
+                <span asp-validation-for="password" class="text-danger"></span>
+            </div>
+
+            @if (!string.IsNullOrWhiteSpace(msjeError))
+            {
+                <div class="row col-12 justify-content-center mx-auto mt-1 mb-2">
+                    <div class="alert alert-danger mx-auto d-flex align-items-center justify-content-between" role="alert">
+                        <span class="material-symbols-outlined">info</span>
+                        @msjeError
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                </div>
+            }
+
+            <div class="my-4 text-end">
+                <button type="submit" class="btn btn-primary primario px-4">Iniciar sesión</button>
+                <a class="btn btn-secondary secondario px-3" role="button" asp-controller="Home" asp-action="Index">Cancelar</a>
+            </div>
+
+            <input type="hidden" name="ReturnUrl" value="@ViewBag.ReturnUrl" />
+        </form>
+    </div>
+</div>
+
+<script>
+    function cambiarTipoLogin(tipo) {
+        const form = document.getElementById("formLogin");
+        const lbl = document.getElementById("lblUsuario");
+        const input = document.getElementById("inputUsuario");
+
+        if (tipo === 'RUT') {
+            form.action = '@Url.Action("AutenticarRUT", "Home")';
+            lbl.innerText = "RUT";
+            input.placeholder = "Ingrese RUT sin puntos ni guión (ej: 12345678)";
+            input.setAttribute("data-bs-title", "RUT sin puntos, sin guión y sin dígito verificador");
+        } else {
+            form.action = '@Url.Action("AutenticarLDAP", "Home")';
+            lbl.innerText = "Usuario Windows";
+            input.placeholder = "Ingrese su usuario Windows";
+            input.setAttribute("data-bs-title", "Usuario Windows. Ej: napellido");
+        }
+    }
+</script>

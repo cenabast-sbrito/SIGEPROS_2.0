@@ -1,0 +1,30 @@
+﻿@{
+    Layout = null;
+    ViewData["Title"] = "Sesión finalizada";
+}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sesión Finalizada - SIGEPROS</title>
+    <link rel="stylesheet" href="@Url.Content("~/lib/bootstrap/dist/css/bootstrap.min.css")" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
+</head>
+<body class="bg-light">
+    <div class="container d-flex justify-content-center align-items-center" style="min-height: 80vh;">
+        <div class="card shadow-lg p-4 text-center" style="max-width: 440px; border-radius: 10px;">
+            <div class="card-body">
+                <i class="fas fa-check-circle text-success mb-3" style="font-size: 3rem;"></i>
+                <h3 class="mb-3 text-success">
+                    Sesión cerrada correctamente
+                </h3>
+                <p class="text-muted mb-4">
+                    Su sesión ha sido finalizada de forma segura.
+                </p>
+               
+            </div>
+        </div>
+    </div>
+</body>
+</html>

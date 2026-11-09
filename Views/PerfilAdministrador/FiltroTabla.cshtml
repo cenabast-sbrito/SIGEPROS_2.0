@@ -1,0 +1,674 @@
+﻿
+<script>
+    const rutLogueado = '@User.FindFirst("Rut")?.Value';
+    const programa = '@User.FindFirst("Programa")?.Value';
+    const nombre = '@User.Identity.Name';
+    const rolReal =  '@User.FindFirst("rolSeleccionado")?.Value';
+</script>
+
+<div id="estadoExpedienteENCABECERA"></div>
+
+<!-- SECCION: FILTRO -->
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="filtro-card">
+
+            <h4 class="section-title">
+                <i class="fa fa-filter"></i> Filtro
+            </h4>
+
+            <div class="row">
+
+                <div class="col-lg-2">
+                    <label for="rutProveedor">
+                        Rut Proveedor
+                    </label>
+                    <input class="form-control"
+                           id="rutProveedor"
+                           type="text"
+                           placeholder="Ingrese Rut, sin puntos, sin guion y sin dv">
+                </div>
+
+                <div class="col-lg-4">
+                    <label for="nombreProveedor">
+                        Proveedor
+                    </label>
+                    <select id="nombreProveedor" class="form-control js-placeholder-single busqueda-por-texto-seleccionFiltro2">
+
+                        <option value="">
+                            Seleccione o busque una opción
+                        </option>
+
+                    </select>
+                </div>
+
+
+                <!-- Factura -->
+                <div class="col-lg-2">
+                    <label for="filtro_Nfactura" class="labelFiltro">Factura</label>
+                    <input id="filtro_Nfactura"
+                           class="form-control form-control-sm"
+                           type="number" />
+                </div>
+
+                <!-- Estado -->
+                <div class="col-md-2">
+                    <label for="filtro_TEstados" class="labelFiltro">Estado</label>
+                    <select id="filtro_TEstados"
+                            class="form-control select2"></select>
+                    <input id="_nEstado" type="text" hidden disabled />
+                </div>
+
+
+
+                <div class="col-lg-2">
+                    <button id="btnFiltroConsulta"
+                            type="button"
+                            class="btn btn-primary btn-filtro">
+                        <i class="fa fa-search"></i>
+                        Aplicar Filtro
+                    </button>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- FIN SECCION: FILTRO -->
+
+<!-- SECCION: FACTURAS -->
+
+<div class="row">
+    <div class="col-md-12">
+
+        <div class="tabla-card">
+
+            <h4 class="section-title">
+                <i class="fa fa-file-invoice-dollar"></i> Facturación
+            </h4>
+
+            <div class="loader_Tablas" style="display:none;">
+                <div class="loader-content">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="sr-only">Cargando...</span>
+                    </div>
+
+                    <div class="loader-text">
+                        Consultando información...
+                    </div>
+                </div>
+            </div>
+
+            <table id="_tablaFacturas"
+                   class="table table-hover table-bordered table-striped table-custom"
+                   width="100%">
+
+                <thead>
+
+
+                </thead>
+
+                <tbody></tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+</div>
+
+<!-- FIN SECCION: FACTURAS-->
+
+
+<!-- SECCION MODAL: CONFIRMAR ARMADO DE EXPEDIENTE -->
+
+<div class="modal fade"
+     id="_Factura_Confirmar_Expediente"
+     tabindex="-1"
+     data-bs-backdrop="static">
+
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">
+                    <i class="bi bi-folder-check me-2"></i>
+                    Confirmar armado de expediente
+                </h5>
+
+                <button type="button"
+                        class="btn-close btn-close-white"
+                        data-bs-dismiss="modal"
+                        aria-label="Close">
+                </button>
+            </div>
+
+            <div class="modal-body">
+
+                <p class="mb-4">
+                    Usted accederá al módulo de creación de expedientes.
+                    Verifique la información antes de continuar.
+                </p>
+
+                <div class="row g-3">
+
+                    <div class="col-md-4">
+                        <label for="_Expediente_rutProveedor"
+                               class="form-label fw-bold">
+                            Rut Proveedor
+                        </label>
+
+                        <input type="text"
+                               id="_Expediente_rutProveedor"
+                               class="form-control"
+                               disabled>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label for="_Expediente_nFactura"
+                               class="form-label fw-bold">
+                            Número Factura
+                        </label>
+
+                        <input type="text"
+                               id="_Expediente_nFactura"
+                               class="form-control"
+                               disabled>
+                    </div>
+
+                </div>
+                <div id="estadoExpediente"></div>
+
+
+            </div>
+
+            <div class="modal-footer">
+                <button type="button"
+                        class="btn btn-success"
+                        id="_generar-Expediente-Factura">
+                    <i class="bi bi-check-circle me-1"></i>
+                    Crear Expediente
+                </button>
+
+                <button type="button"
+                        class="btn btn-secondary"
+                        data-bs-dismiss="modal">
+                    Cancelar
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+<!-- FIN SECCION MODAL -->
+
+<!-- SECCION MODAL: VER EXPEDIENTE -->
+
+<div class="modal fade"
+     id="_Factura_modal-ver-Expediente"
+     tabindex="-1"
+     data-bs-backdrop="static">
+
+    <div class="modal-dialog modal-expediente">
+        <div class="modal-content">
+
+            <div class="modal-header bg-primary">
+                <h4 class="modal-title">Expediente</h4>
+
+                <button type="button"
+                        class="btn-close btn-close-white"
+                        data-bs-dismiss="modal"
+                        aria-label="Close">
+                </button>
+            </div>
+
+            <div class="modal-body modal-body-expediente">
+                <iframe id="_Factura_ExpedientePreviewIFrame"
+                        class="iframe-expediente">
+                </iframe>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button"
+                        class="btn btn-primary"
+                        data-bs-dismiss="modal">
+                    Salir
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- FIN SECCION MODAL -->
+
+
+<!-- MODAL DOCUMENTOS ADJUNTOS -->
+
+<div class="modal fade"
+     id="_modal_DocumentosAdjuntos"
+     tabindex="-1"
+     data-bs-backdrop="static">
+
+    <div class="modal-dialog modal-expediente">
+        <div class="modal-content">
+
+            <div class="modal-header bg-primary">
+                <h4 class="modal-title">Documentos Adjuntos</h4>
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Close">
+                </button>
+            </div>
+
+            <div class="modal-body modal-body-expediente">
+
+                <!-- PANEL IZQUIERDO -->
+                <div class="documentos-listado">
+
+                    <div class="mb-2">
+                        <label class="form-label">Proveedor</label>
+                        <input type="text" id="rutModal" class="form-control" readonly>
+                        <input type="text" id="nombreProveedorModal" class="form-control" readonly>
+                    </div>
+
+
+                    <div class="mb-3">
+                        <label class="form-label">Factura</label>
+                        <input type="text" id="facturaModal" class="form-control" readonly>
+                    </div>
+
+                    <table id="_tablaDocumentosAdjuntos"
+                           class="table table-striped table-bordered">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Nombre del archivo</th>
+                                <th>Ver</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+
+                </div>
+
+                <!-- PANEL DERECHO -->
+                <div class="documentos-preview">
+
+                    <iframe id="_documentoAdjuntoPreview"
+                            name="_documentoAdjuntoPreview"
+                            class="iframe-documentos">
+                    </iframe>
+
+                </div>
+
+            </div>
+
+
+
+
+            <div class="modal-footer">
+                <button type="button"
+                        class="btn btn-primary"
+                        data-bs-dismiss="modal">
+                    Salir
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+<!-- FIN MODAL DOCUMENTOS ADJUNTOS -->
+<!-- MODAL VER FACTURA COMISION -->
+<div class="modal fade" id="_Factura_modal-ver-FacturaComision" tabindex="-1" data-backdrop="static">
+    <div class="modal-dialog modal-factura-comision" role="document">
+        <div class="modal-content">
+
+            <div class="modal-header bg-primary">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+                <h4 class="modal-title" id="modal-ver-facturacomision-titulo">
+                    Factura Comisión
+                </h4>
+            </div>
+
+            <div class="modal-body modal-body-factura-comision">
+                <iframe id="_Factura_ComisionPreviewIFrame"
+                        name="_Factura_ComisionPreviewIFrame"
+                        class="iframe-factura-comision">
+                </iframe>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal">
+                    Salir
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
+<!-- FIN MODAL VER FACTURA COMISION -->
+<!-- MODAL VER DOCUMENTOS -->
+<div class="modal fade"
+     id="_modalDocumento"
+     tabindex="-1"
+     data-bs-backdrop="static">
+
+    <div class="modal-dialog modal-expediente">
+        <div class="modal-content">
+
+            <div class="modal-header bg-primary">
+                <h4 class="modal-title"><div id="modalDocumentoTitulo"></div></h4>
+
+                <button type="button"
+                        class="btn-close btn-close-white"
+                        data-bs-dismiss="modal"
+                        aria-label="Close">
+                </button>
+            </div>
+
+            <div class="modal-body modal-body-expediente">
+                <iframe id="_frameDocumento"
+                        class="iframe-expediente">
+                </iframe>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button"
+                        class="btn btn-primary"
+                        data-bs-dismiss="modal">
+                    Salir
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- MODAL GUIAS -->
+
+<div class="modal fade"
+     id="_Factura_Guias"
+     tabindex="-1"
+     aria-hidden="true">
+
+    <div class="modal-dialog modal-fullscreen">
+
+        <div class="modal-content">
+
+            <div class="modal-header bg-primary text-white">
+
+                <h5 class="modal-title">
+                    Guías
+                </h5>
+
+                <button type="button"
+                        class="btn-close btn-close-white"
+                        data-bs-dismiss="modal">
+                </button>
+
+            </div>
+
+            <div class="modal-body guias-body">
+
+                <div class="panel-izquierdo">
+
+                    <!-- PANEL GUIAS -->
+                    <div class="table">
+
+
+                        <div class="loader_Tablas" style="display:none;">
+                            <div class="loader-content">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="sr-only">Cargando...</span>
+                                </div>
+
+                                <div class="loader-text">
+                                    Consultando información...
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Tabla Guias -->
+                        <table id="tablaGuias" class="table table-hover table-bordered table-striped table-datatable-app">
+                        </table>
+
+                    </div>
+
+                    <!-- PANEL DOCUMENTOS -->
+                    <div class="panel-documentos">
+
+                        <div class="titulo-seccion">
+                            Documentos del proveedor
+                        </div>
+
+                        <div class="tabla-documentos-container">
+
+
+                            <div id="spinnerDocumentos" class="text-center table-overlay" style="display:none; padding:20px">
+                                <i class="fas fa-spinner fa-spin fa-3x"></i>
+                                <div>Buscando documentos...</div>
+                            </div>
+                            <table id="tablaDocumentos"
+                                   class="table table-striped table-bordered">
+
+                                <thead>
+                                    <tr>
+                                        <th>#</th> 
+                                        <th>Nombre del archivo</th>
+                                        <th>Ver</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody></tbody>
+
+                            </table>
+
+                        </div>
+
+                    </div>
+
+
+                </div>
+
+                <div class="panel-derecho">
+
+
+                    <!-- PANEL PDF -->
+                    <div class="panel-pdf">
+
+                        <div class="titulo-seccion">
+                            Vista previa
+                        </div>
+
+                        <div id="iframeGuiaWrapper" >
+
+                            <iframe id="_guiaPreview"
+                                    name="_guiaPreview">
+                            </iframe>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+
+                <button type="button"
+                        class="btn btn-secondary"
+                        data-bs-dismiss="modal">
+                    Salir
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<!-- MODAL ACEPTA CON OBSERACION -->
+<div class="modal fade"
+     id="_Acepta_Observacion"
+     data-bs-backdrop="static"
+     data-bs-keyboard="false"
+     tabindex="-1" role="dialog"
+     aria-labelledby="modalUsuarioLabel"
+     aria-hidden="true">
+
+    <div class="modal-dialog modal-dialog-centered modal-md">
+        <div class="modal-content shadow">
+
+            <!-- Encabezado -->
+            <div class="modal-header bg-primary text-white py-2">
+                <h5 class="modal-title mb-0" id="modalDocumentoTitulo"></h5>
+
+                <button type="button"
+                        class="btn-close btn-close-white"
+                        data-bs-dismiss="modal"
+                        aria-label="Cerrar">
+                </button>
+            </div>
+
+            <!-- Cuerpo -->
+            <div class="modal-body">
+                <div class="alert alert-light border mb-3">
+                    <span id="lblAccion"></span>
+                </div>
+
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold mb-1">
+                        Acción seleccionada
+                    </label>
+
+                    <input type="text"
+                           id="modal_TEstadoOK"
+                           class="form-control text-center fw-bold"
+                           readonly>
+                </div>
+
+                <div class="mb-3">
+                    <label for="_CampoObservacion" class="form-label fw-semibold">
+                        Observación
+                    </label>
+
+                    <textarea id="_CampoObservacion"
+                              class="form-control" style="height: auto;"
+                              rows="5"
+                              maxlength="500"
+                              placeholder="Ingrese una observación clara y breve"></textarea>
+                </div>
+
+                <!-- Campos ocultos -->
+                <input type="hidden" id="modal_rut" />
+                <input type="hidden" id="modal_factura" />
+                <input type="hidden" id="modal_estadoActual" />
+                <input type="hidden" id="modal_estadoNuevo" />
+                <input type="hidden" id="modal_fila" />
+                <input type="hidden" id="modal_obj" />
+
+                <div id="_mensaje_Observaciones"
+                     class="small text-danger mt-2">
+                </div>
+
+            </div>
+
+            <!-- Pie -->
+            <div class="modal-footer py-2">
+                <button type="button"
+                        class="btn btn-secondary"
+                        data-bs-dismiss="modal">
+                    Cancelar
+                </button>
+
+                <button type="button"
+                        class="btn btn-primary"
+                        id="_acepta-cambio-estado">
+                    Confirmar Cambio
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalObservacion"
+     data-bs-backdrop="static"
+     data-bs-keyboard="false"
+     tabindex="-1" role="dialog"
+     aria-labelledby="modalProveedorLabel"
+     aria-hidden="true"
+>
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="modalObsLabel">Observación de Factura</h5>
+                <button type="button"
+                        class="btn-close btn-close-white"
+                        data-bs-dismiss="modal"
+                        aria-label="Cerrar">
+                </button>
+
+            </div>
+            <div class="modal-body">
+
+                <div id="textoObservacion" class="p-2" style="white-space: pre-wrap;"></div>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- SECCION CODIGO -->
+@section Scripts
+{
+    <script>
+
+        $(document).ready(function () {
+
+            prov_getListProveedores('rutProveedor', 'nombreProveedor');
+            ////$.fn.getListProveedores('', 'nombreProveedor');
+            $.fn.getListEstados('', 'filtro_TEstados');
+
+        });
+
+        function cerrarGuias() {
+
+            $('#_Factura_Guias').modal('hide');
+
+            $('#_Factura_Guias').hide();
+
+            $('.modal-backdrop').remove();
+
+            $('body').removeClass('modal-open');
+        }
+    </script>
+}
+
+
+
+
+
+
+

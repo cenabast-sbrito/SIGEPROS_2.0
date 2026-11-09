@@ -1,0 +1,408 @@
+﻿@using SIGEPROS.Static
+@using SIGEPROS.Utils
+@inject IHttpContextAccessor HttpContextAccessor
+@inject IConfiguration Configuration
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - SIGEPROS</title>
+
+
+    <link rel="stylesheet" href="@Url.Content("~/lib/bootstrap/dist/css/bootstrap.min.css")" />
+
+    <link rel="stylesheet" href="@Url.Content("~/css/site.css")" asp-append-version="true" />
+    <link rel="stylesheet" href="@Url.Content("~/css/_estilosApp.css")" asp-append-version="true" />
+    <link rel="stylesheet" href="@Url.Content("~/css/sidebar.css")" asp-append-version="true" />
+    <link rel="stylesheet" href="@Url.Content("~/css/toast.css")" asp-append-version="true" />
+
+    <link rel="stylesheet" href="@Url.Content("~/lib/datatables/DataTables-1.13.10/css/dataTables.bootstrap5.min.css" )" />
+    <link rel="stylesheet" href="@Url.Content("~/lib/datatables/Buttons-2.4.2/css/buttons.dataTables.min.css" )" />
+    <link rel="stylesheet" href="@Url.Content("~/lib/datatables/Buttons-2.4.2/css/buttons.bootstrap5.min.css" )" />
+
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.1.5/css/dataTables.dataTables.min.css" />
+
+    <link rel="stylesheet" href="@Url.Content("~/css/css-select/select2.min.css")" />
+
+    <!-- PARA EL USO DE LOS ICONOS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+
+    <!-- Sweet Alert 2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+</head>
+
+<body>
+
+    <div id="toast-container-app" class="toast-container"></div>
+
+    @{
+        string imagen = "";
+        string img_cenabast = "../images/logo.png";
+        string img_minsal = "../images/minsal.png";
+    }
+
+    @if (@User.HasClaim("rolSeleccionado", "ADM"))
+    {
+        imagen = img_cenabast;
+    }
+    @if (@User.HasClaim("rolSeleccionado", "ADP"))
+    {
+        imagen = img_cenabast;
+    }
+    @if (@User.HasClaim("rolSeleccionado", "MIN"))
+    {
+        imagen = img_minsal;
+    }
+    @if (@User.HasClaim("rolSeleccionado", "MIP"))
+    {
+        imagen = img_minsal;
+    }
+
+    <div class="wrapper">
+        <!-- Header -->
+
+        <header>
+            <nav class="navbar bg-dark py-3">
+                <div class="container-fluid mx-4">
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        <a class="navbar-brand heading-xs-sans text-white" role="button" >
+
+                            <img src="@imagen" />
+
+                            @* SIGEPROS *@
+                            <button class="navbar-toggler text-white align-middle ps-2" type="button" id="hamburgerButton" aria-label="Toggle navigation">
+                                <span class="material-symbols-outlined">menu</span>
+                            </button>
+
+                        </a>
+
+                    }
+
+                    @if (User.Identity.IsAuthenticated)
+                    {
+@*                         <div class="dropdown text-end d-flex align-items-center">
+                            <div class="">
+                                <button id="menosFuente" type="button" class="btn btn-sm btn-outline-light">
+                                    A-
+                                </button>
+
+                                <button id="resetFuente" type="button" class="btn btn-sm btn-outline-light">
+                                    A
+                                </button>
+
+                                <button id="masFuente" type="button" class="btn btn-sm btn-outline-light">
+                                    A+
+                                </button>
+                            </div>
+                        </div> *@
+
+                    }
+
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        var imagenDefault = "~/images/user.png";
+
+                        <div class="dropdown text-end d-flex align-items-center">
+                            <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                
+                                <img src=@PathHelper.GetPath("~/images/user.png", HttpContextAccessor.HttpContext) 
+                                     alt="" 
+                                     width="32"
+                                     height="32"
+                                     class="rounded-circle me-3"
+                                     onerror="this.onerror=null; this.src='@Url.Content(imagenDefault)';"
+                                     />
+
+                                <strong class="body-xs mb-0 pe-2">@User.Identity.Name</strong>
+                            </a>
+                            <ul class="dropdown-menu text-white bg-dark text-small shadow">
+                                <li><a class="dropdown-item" role="button" asp-controller="Home" asp-action="Logout">Cerrar sesión</a></li>
+                            </ul>
+                        </div>
+                    }
+
+                </div>
+            </nav>
+        </header>
+        @{
+            bool puedeAdministrarPNAC = User.HasClaim("Programa_0", "Administra");
+            bool puedeAdministrarPNI = User.HasClaim("Programa_1", "Administra");
+        }
+        <script>
+            const puedeAdministrarPnac = @puedeAdministrarPNAC.ToString().ToLower();
+            const puedeAdministrarPni = @puedeAdministrarPNI.ToString().ToLower();
+        </script>
+
+        @if (User.Identity.IsAuthenticated)
+        {
+            <!-- Sidebar -->
+            <div class="sidebar bg-dark" id="sidebarMenu">
+                <a class="navbar-brand sidenav heading-xs-sans text-white ms-5" role="button" >
+                    SIGEPROS
+                    <button class="navbar-toggler sidenav text-white align-middle ps-2" type="button" id="sidehamburgerButton" aria-label="Toggle navigation">
+                        <span class="material-symbols-outlined">menu</span>
+                    </button>
+                </a>
+
+                <nav class="list-group list-group-flush mt-5">
+                    <a class="sidebar-link @(ViewData["ActiveView"]?.ToString() == "menu1" ? "active" : "")"
+                       role="button" asp-controller="Home" asp-action="viewFacturacion">
+                        <span>Facturación</span>
+                        <i class="fas fa-file-invoice-dollar"></i>
+                    </a>
+
+                    @if (puedeAdministrarPNAC || puedeAdministrarPNI)
+                    {
+                        <a class="sidebar-link @(ViewData["ActiveView"]?.ToString() == "menu1" ? "active" : "")"
+                           role="button" asp-controller="Admin" asp-action="_viewCargaPlanilla">
+                            <span>Carga Planilla</span>
+                            <i class="fas fa-file-excel"></i>
+                        </a>
+                        <a class="sidebar-link @(ViewData["ActiveView"]?.ToString() == "menu1" ? "active" : "")"
+                           role="button" asp-controller="Admin" asp-action="_viewCargaDocumentos">
+                            <span>Carga Documentos</span>
+                            <i class="fas fa-file-upload"></i>
+                        </a>
+                        <a class="sidebar-link @(ViewData["ActiveView"]?.ToString() == "menu1" ? "active" : "")"
+                           role="button" asp-controller="Admin" asp-action="_viewCargaUsuarios">
+                            <span>Usuarios</span>
+                            <i class="fas fa-users-cog"></i>
+                        </a>
+                        <a class="sidebar-link @(ViewData["ActiveView"]?.ToString() == "menu1" ? "active" : "")"
+                           role="button" asp-controller="Admin" asp-action="_viewCargaProveedores">
+                            <span>Proveedores</span>
+                            <i class="fas fa-handshake"></i>
+                        </a>
+                    }
+
+                    <a class="sidebar-link @(ViewData["ActiveView"]?.ToString() == "menu1" ? "active" : "")"
+                       role="button" asp-controller="Admin" asp-action="_viewHistorial">
+                        <span>Histórico</span>
+                        <i class="fas fa-archive"></i>
+                    </a>
+                </nav>
+            </div>
+        }
+
+        @{
+            TempData.Keep("App_RutUsuario");
+        }
+
+        <!-- Main -->
+        <main id="mainContent" role="main" class="content mx-2" style="min-height:100vh">
+            <div class="container-fluid ">
+                @RenderBody()
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="d-flex justify-content-center align-items-center px-4 px-md-5 body-s mb-0">
+            <div class="d-flex gap-3 justify-content-between w-100">
+                <div class="d-flex flex-column align-self-start pt-1 mt-3">
+                    <p class="mb-2 text-center">Versión @Configuracion.GetVersion(Configuration)</p> 
+                    <div class="d-flex gap-0 pr-5 mt-3">
+                        <div class="flex-shrink-0 bg-primario" style="height: 0.5rem; width: 41px;"></div>
+                        <div class="flex-shrink-0 bg-accent" style="height: 0.5rem; width: 69px;"></div>
+                    </div>
+                </div>
+
+
+                @if (Configuracion.GetAmbiente(Configuration) == "TEST")
+                {
+                    <div class="d-flex flex-column align-self-start pt-1 mt-3">
+                    
+                            <p class="mb-2 text-center">Versión @Configuracion.GetAmbiente(Configuration)</p> 
+                            <div class="d-flex gap-0 pr-5 mt-3">
+                                <div class="flex-shrink-0 bg-primario" style="height: 0.5rem; width: 41px;"></div>
+                                <div class="flex-shrink-0 bg-accent" style="height: 0.5rem; width: 69px;"></div>
+                            </div>
+                    </div>
+                }
+
+
+
+                <div class="d-flex flex-column justify-content-end">
+                    <div class="d-flex flex-column align-self-end pt-1 mt-1">
+                        <img src="@Url.Content("~/images/logo_cenabast_blanco.png")" width="140" />
+                    </div>
+                    <p class="text-end mb-4">SIGEPROS, Sistema Gestión Expedientes Programas de Salud</p>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script src="@Url.Content("~/lib/jquery/dist/jquery.min.js")"></script>
+    <script src="@Url.Content("~/lib/datatables/datatables-1.13.10/js/jquery.datatables.js")"></script>
+    <script src="@Url.Content("~/lib/datatables/datatables-1.13.10/js/jquery.datatables.min.js")"></script>
+    <script src="@Url.Content("~/lib/datatables/datatables-1.13.10/js/datatables.bootstrap5.js")"></script>
+    <script src="@Url.Content("~/lib/bootstrap/dist/js/bootstrap.bundle.min.js")"></script>
+    <script src="@Url.Content("~/js/js-select/select2.full.js")"></script>
+    <script src="@Url.Content("~/js/js-select/select2.full.min.js")"></script>
+
+    <script src="@Url.Content("~/js/site.js")" asp-append-version="true"></script>
+    <script src="@Url.Content("~/js/Tools.js")" asp-append-version="true"></script>
+    <script src="@Url.Content("~/js/app.js")" asp-append-version="true"></script>
+    <script src="@Url.Content("~/js/upload.js")" asp-append-version="true"></script>
+    <script src="@Url.Content("~/js/_proveedor.js")" asp-append-version="true"></script>
+    <script src="@Url.Content("~/js/_proveedorM.js")" asp-append-version="true"></script>
+    <script src="@Url.Content("~/js/_usuario.js")" asp-append-version="true"></script>
+    <script src="@Url.Content("~/js/_expediente.js")" asp-append-version="true"></script>
+
+    <script src="@Url.Content("~/js/_historial.js")" asp-append-version="true"></script>
+
+
+
+
+
+
+    @await RenderSectionAsync("Scripts", required: false)
+
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+</body>
+</html>
+
+
+
+
+
+
+
+<!-- Modal Confirma Acción -->
+<div class="modal fade" id="modalAccionesSistema" tabindex="-1" aria-labelledby="modalAccionesLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title fs-5" id="exampleModalLabel">Mensaje</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+
+                <div class="alert alert-success" role="alert">
+                    <strong></strong><p id="mensajeAccionSistema"></p>
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal Mensaje Sistema -->
+<div class="modal fade" id="modalMensajeSistema" tabindex="-1" aria-labelledby="modalNotificadoLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title fs-5" id="exampleModalLabel">Atención:</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+
+                <div class="alert alert-warning" role="alert">
+                    <strong>Atención!</strong><p id="mensajeSistema"></p>
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal Desicion SI NO CANCELAR -->
+<div class="modal fade" id="modalDecision" tabindex="-1" aria-labelledby="modalDecision" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title fs-5" id="modalDecisionTitulo">Atención:</h4>
+            </div>
+            <div class="modal-body">
+
+                <div class="alert alert-warning" role="alert">
+
+                    <strong>Atención!</strong>@* <p id="mensajeSistemaDe"></p> *@
+                    <p class="modal-title fs-5" id="modalDecisionTexto"></p>
+
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-success" data-bs-dismiss="modal" aria-label="SI"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

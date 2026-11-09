@@ -1,0 +1,534 @@
+﻿<script>
+
+    document.addEventListener("DOMContentLoaded", () => {
+        _getListTiposDocumento('_tipoDocumentoCarga');
+
+        $('#form-upload-documentos').on('submit', function (event) {
+
+            event.preventDefault();
+
+            let factura = $('#_facturaLista').val();
+            let rut = $('#_rutProveedorCarga').val();
+            let tdoc = $('#_tipoDocumentoCarga').val();
+            let fileInput = $('#file-upload-documento')[0];
+            let antiForgeryToken = $('input[name=__RequestVerificationToken]').val();
+            
+            btnPressed = 'btnFileUploadDocumento';
+
+            // Validaciones
+            if (!rut || rut.trim() === '') {
+                    Swal.fire('Aviso', 'Debe seleccionar un proveedor.', 'warning');
+                ////showToast("Debe seleccionar un proveedor.", "warning", 3000);
+                btnON(btnPressed, 'Cargar');
+                return;
+            }
+
+            if (!factura || factura.trim() === '') {
+                    Swal.fire('Aviso', 'Debe seleccionar una Factura.', 'warning');
+                ////showToast("Debe seleccionar un documento.", "warning", 3000);
+                btnON(btnPressed, 'Cargar');
+                return;
+            }
+
+            if (!tdoc || tdoc.trim() === '') {
+                    Swal.fire('Aviso', 'Debe seleccionar un tipo de documento.', 'warning');
+                ////showToast("Debe seleccionar un tipo de documento.", "warning", 3000);
+                btnON(btnPressed, 'Cargar');
+                return;
+            }
+
+            if (!fileInput.files || fileInput.files.length === 0) {
+                    Swal.fire('Aviso', 'Debe seleccionar un archivo PDF.', 'warning');
+                ////showToast("Debe seleccionar un archivo PDF.", "warning", 3000);
+                btnON(btnPressed, 'Cargar');
+                return;
+            }
+  
+
+
+////            if (!validarFormularioUpload()) {
+////                btnON(btnPressed, 'Cargar');
+////                return;
+////            }
+
+            btnOFF(btnPressed, 'Cargando Documento...');
+
+            let formData = new FormData();
+                formData.append('archivoPDF', fileInput.files[0]);
+                formData.append('__RequestVerificationToken', antiForgeryToken);
+                formData.append('_facturaLista', factura);
+                formData.append('_rutProveedorCarga', rut);
+                formData.append('_tipoDocumentoCarga', tdoc);
+                
+                $("#nombreFile").text('Documento: ' + fileInput.files[0].name);
+                
+                $.ajax({
+                    url: "../Upload/subirDocumento",
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+
+                    success: function (response) {
+                             console.log('RESPUESTA->',response); 
+                            // console.log(response.state);
+                            // console.log(typeof response.state);
+                        if (response.status) {
+                            showToast(response.message, "success", 3000);
+            
+                                llamarDocumentosAdjuntos(
+                                                    $('#_rutProveedorCarga').val(),$('#_facturaLista').val()                
+                                );
+
+                        } else {
+                            showToast("form-upload-documentos: Ocurrió algún error. " + response.message, "error", 4000);
+                        }
+                        btnON(btnPressed, 'Cargar');
+                    },
+                    error: function (xhr, status, error) {
+
+                            /////console.log("XHR:", xhr);
+                            /////console.log("Status:", status);
+                            /////console.log("Error:", error);
+                            /////console.log("Response:", xhr.responseText);
+
+                            showToast("form-upload-documentos 2: Ocurrió algún error.", "error", 4000);
+
+                        btnON(btnPressed, 'Cargar');
+                    }              
+                });
+        });
+
+        $('#href_subirDocumentos').on('shown.bs.tab', function () {
+            try {
+                _ocultarImagen();
+                $('#organismoDefinido').val($('#organismo').val());
+                prov_getListProveedores('_rutProveedorCarga', '_nombreProveedorCarga');
+                _getListTiposDocumento('_tipoDocumentoCarga');
+            } catch (err) {
+                console.error("Error al inicializar carga de documentos:", err);
+            }
+        });
+        $("#file-upload-documento").on("change", function () {
+
+        let nombre = this.files.length
+            ? this.files[0].name
+            : "Ningún archivo seleccionado.";
+
+        $("#nombreFile").text(nombre);
+
+        });
+        $(document).on('change', '#_nombreProveedorCarga', function () {
+            document.getElementById('_rutProveedorCarga').value = this.value
+            _getListFacturas(document.getElementById('_rutProveedorCarga').value,'_facturaLista');
+        });
+
+    });
+    function llamarDocumentosAdjuntos(rut, factura) {
+
+       // if (existeDocumentoAjunto(rut, factura))
+            fn_getDocumentosAdjuntos(
+                factura,
+                rut,
+                true)
+       // else avisoFinProceso("Sin Documentos Adjuntos")
+       /// _getFacturaComision(rut, factura)
+    }
+    function fn_getDocumentosAdjuntos(  factura, rut,  permiteVer) {
+        try {
+
+            inicializarOTablaVacia("tablaDocumentosAdjuntos-1");
+
+            showSpinnerDocumentos('spinnerDocumentos');
+
+            let ruta, json;
+
+                ruta = "../Documentos/getDocumentosAdjuntos";
+                json = { rut: rut, factura: factura };
+
+            $.ajax({
+                type: "GET",
+                data: json,
+                url: ruta,
+
+                success: function (res) {
+                    ////console.log(res);
+                    if (!res.state) return;
+                    res.archivos.nombres.forEach(function (item, i) {
+                       let url = `${res.archivos.urlDA}${item.nombre}`;
+                       let fila = permiteVer
+                                    ? [
+                                        i + 1,
+                                        item.nombre,
+                                         `<a target='_documentosAdjuntosIFrame' href='${url}'>
+                                            <i class='fas fa-eye' style='font-size:28px'></i>
+                                         </a>`
+                                    ]
+                                    : [i + 1, item.nombre, ''];
+                        tableDocumentos.row.add(fila);
+                    });
+
+                    tableDocumentos.draw();
+
+                },
+
+                complete: function () {
+                    hideSpinnerDocumentos('spinnerDocumentos');
+                },
+
+                error: function (xhr) {
+
+                    /////console.log(xhr);
+                    hideSpinnerDocumentos('spinnerDocumentos');
+
+                    avisoFinProceso("fn_getDocumentosAdjuntos: Ocurrió algún error", xhr);
+
+                }
+            });
+
+        } catch (ex) {
+            ////console.log(ex);
+            hideSpinnerDocumentos('spinnerDocumentos');
+            avisoFinProceso("fn_getDocumentosAdjuntos: Ocurrió algún error");
+            console.error("Error:", ex);
+        }
+    }
+    function _getFacturaComision(rut, factura) {
+
+        var json = {
+            rut: rut,
+            factura: factura
+        }
+
+        try {
+            $.ajax({
+                type: "GET",
+                url: "../Documentos/getFacturaComision",
+                data: json,
+                success: function (res) {
+                    $('#upload_facturaComision').html(res.archivo);
+                },
+                error: function (xhr) {
+                    // if (xhr.status === 404) { // 404: No se encuentra el recurso
+                    //     alert('Tu sesión ha expirado.');
+                    //     window.location.href = apiUrl("");
+                    // } else {
+                        avisoFinProceso("_getFacturaComision: Ocurrio algún error");
+                    /////}
+                }
+            });
+        } catch (ex) {
+            console.error("Ha ocurrido un error : " + ex.name + " " + ex.message);
+        }
+    }
+    function inicializarOTablaVacia(tablaId) {
+
+        if ($.fn.DataTable.isDataTable('#' + tablaId)) {
+
+            tableDocumentos.clear().draw();
+
+        } else {
+
+            tableDocumentos = $('#' + tablaId).DataTable({
+                paging: true,
+                searching: false,
+                info: false,
+                autoWidth: false,
+                language: {
+                    emptyTable: "No se encontraron documentos"
+                }
+            });
+
+            // Marcar fila seleccionada
+            $('#' + tablaId + ' tbody').on('click', 'tr', function () {
+
+                $('#' + tablaId + ' tbody tr')
+                    .removeClass('fila-seleccionada');
+
+                $(this).addClass('fila-seleccionada');
+
+            });
+                $('#' + tablaId + ' tbody').on('click', 'tr, tr a', function () {
+
+        let fila = $(this).closest('tr');
+
+        $('#' + tablaId + ' tbody tr')
+            .removeClass('fila-seleccionada');
+
+        fila.addClass('fila-seleccionada');
+
+    });
+        }
+    }
+
+        function inicializarOTablaVaciaOLD(tablaId) {
+
+        if ($.fn.DataTable.isDataTable('#' + tablaId)) {
+            tableDocumentos.clear().draw();
+        } else {
+            tableDocumentos = $('#' + tablaId).DataTable({
+                paging: true,
+                searching: false,
+                info: false,
+                autoWidth: false,
+                language: {
+                    emptyTable: "No se encontraron documentos"
+                }
+            });
+        }
+    }
+        function _getListFacturas(campo, listaDestino) {
+
+        var json = {
+            rutproveedor: campo
+        }
+
+        try {
+            $.ajax({
+                type: "GET",
+                url: "../Proveedor/getListFacturas",
+                data: json,
+                success: function (res) {
+                    let option = "<option value=''>Seleccione una Factura</option>";
+                    for (var element of res) {
+                        option = option +
+                            '<option value="' + element.factura + '">' +
+                            element.factura +
+                            '</option>';
+                    }
+                    $('#' + campo).val('');
+                    $('#' + listaDestino).html(option);
+                },
+                error: function (xhr) {
+                         avisoFinProceso("_getListFacturas: Ocurrio algún error");
+                }
+            });
+        } catch (ex) {
+            console.error("Ha ocurrido un error : " + ex.name + " " + ex.message);
+        }
+    }
+    function _getListTiposDocumento(listaDestino) {
+        $.ajax({
+            type: "GET",
+            url: "../Documentos/getTiposDocumento",
+            success: function (res) {
+                let options = "<option value=''>Seleccione Tipo de Documento</option>";
+                if (Array.isArray(res) && res.length > 0) {
+                    res.forEach(function (item) {
+                        options += `<option value="${item.codigo}">${item.nombre}</option>`;
+                    });
+                }
+                $('#' + listaDestino).html(options);
+            },
+            error: function (xhr) {
+                avisoFinProceso("_getListTiposDocumento: Ocurrió algún error al cargar tipos de documento.");
+            }
+        });
+    }
+</script>
+
+<!-- CAMBIOS -->
+
+<div class="panel panel-primary">
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="titulo-principal">
+                <h2>Subir documentos adjuntos PDF</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+
+
+        <form role="form" id="form-upload-documentos" method="POST" enctype="multipart/form-data" asp-action="UploadFile">
+
+            <!-- Datos de carga -->
+            <div class="row">
+
+                <div class="col-md-12">
+
+                    <div id="resumenCarga" class="tabla-card">
+
+                        <h4 class="section-title">
+                            <i class="fa fa-list-alt"></i>
+                            DATOS DE LA CARGA
+                        </h4>
+
+                        <div class="row">
+                            <div class="input-group">
+
+                                <partial name="../PerfilAdministrador/_proveedor" />
+
+                                <div class="col-lg-4" style="align-content: end;">
+                                    <label class="labelFiltro">
+                                        Nro. Documento
+                                    </label>
+
+                                    <div class="inputFiltro">
+                                        <select id="_facturaLista"
+                                                class="form-control select2"
+                                                required>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-lg-2" style="align-content: end;">
+
+                                    <button type="button"
+                                            class="btn btn-primary"
+                                            onclick="llamarDocumentosAdjuntos($('#_rutProveedorCarga').val(), $('#_facturaLista').val() );">
+                                        Ver documentos
+                                    </button>
+                                </div>
+                            
+                            </div>
+                        </div>
+
+                        <div class="row" style="margin-top:15px;margin-bottom:15px;">
+                            <!-- Documento -->
+
+
+                            <!-- Tipo Documento -->
+                            <div class="col-lg-2">
+                                <label class="labelFiltro">
+                                    Tipo de Documento
+                                </label>
+
+                                <div class="inputFiltro">
+                                    <select id="_tipoDocumentoCarga"
+                                            class="form-control select2"
+                                            required>
+                                        <option value="">Seleccione Tipo de Documento</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Archivo PDF -->
+                            <div class="col-lg-6" style="align-content: end;">
+
+                                    <div class="file-upload-container">
+
+                                        <label for="file-upload-documento" class="file-upload-btn">
+                                            <i class="fa fa-file-pdf-o"></i>
+                                            Seleccionar archivo
+                                        </label>
+
+                                        <span id="nombreFile" class="file-upload-name">
+                                            Ningún archivo seleccionado
+                                        </span>
+
+
+                                        <input id="file-upload-documento"
+                                               type="file"
+                                               name="archivoPDF"
+                                               accept="application/pdf"
+                                               class="form-control"
+                                               style="height: 50px !important; align-content: center; font-weight: bold;" />
+
+                                    </div>
+
+                            </div>
+
+                            <!-- Botón -->
+                            <div class="filtro">
+                                <label class="labelFiltro">
+                                    Documentos Adjuntos
+                                </label>
+
+                                <div class="inputFiltro">
+                                    <button id="btnFileUploadDocumento"
+                                            type="submit"
+                                            class="btn btn-primary w-100">
+                                        Cargar
+                                    </button>
+
+                                    <span id="nombreFileDoc"
+                                          class="body-xs bold">
+                                    </span>
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+
+        </form>
+
+    </div>
+   
+    <div class="row">
+
+        <!-- SECCION: RESUMEN CARGA -->
+        <div class="col-md-3">
+
+            <div id="resumenCarga"
+                 class="tabla-card">
+
+                <h4 class="section-title">
+                    <i class="fa fa-list-alt"></i>
+                    Documentos Adjuntados
+                </h4>
+
+                <div id="spinnerCargaDA" class="text-center table-overlay" style="display:none; padding:20px">
+                    <i class="fas fa-spinner fa-spin fa-3x"></i>
+                    <div>Cargando Planilla...</div>
+                </div>
+
+                <table id="tablaDocumentosAdjuntos-1" class="table table-bordered table-striped table-custom">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Nombre del archivo</th>
+                            <th>ver</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Aquí se llenan las filas desde el AJAX -->
+                    </tbody>
+                </table>
+
+            </div>
+
+
+
+        </div>
+        <!-- FIN SECCION: RESUMEN CARGA -->
+        <!-- SECCION: VISOR -->
+        <div class="col-md-9">
+
+            <div id="resumenCarga"
+                 class="tabla-card">
+
+                <h4 class="section-title">
+                    <i class="fa fa-list-alt"></i>
+                    Visor de Documentos
+                </h4>
+
+                <div>
+                    <iframe id="_documentosAdjuntosIFrame"
+                            name="_documentosAdjuntosIFrame"
+                            style="
+                                    width:100%;
+                                    height:800px;
+                                    border:none;
+                                    border-radius:4px;">
+                    </iframe>
+                </div>
+
+
+            </div>
+
+
+
+        </div>
+        <!-- FIN SECCION: VISOR -->
+
+    </div>
+
+</div>
+
+<!-- FIN CAMBIOS -->

@@ -1,0 +1,46 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+
+
+
+<script>
+
+    document.addEventListener("DOMContentLoaded", () => {
+
+                prov_getListProveedores('_rutProveedorCarga', '_nombreProveedorCarga');
+
+    });
+
+</script>
+
+<style>
+    .excel-preview {
+        display: flex;
+        overflow-x: auto;
+        border: 1px solid #ccc;
+        background: white;
+        padding: 10px;
+        gap: 2px;
+    }
+
+    .cell {
+        min-width: 140px;
+        border: 1px solid #d9d9d9;
+        padding: 10px;
+        text-align: center;
+        background: #fff;
+        font-size: 13px;
+    }
+
+    .required {
+        background: #fff2cc;
+        border: 2px solid #70ad47;
+        font-weight: bold;
+    }
+</style>
+
+
+<partial name="../PerfilAdministrador/_CargaPlanilla" />

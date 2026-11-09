@@ -1,0 +1,148 @@
+﻿<div class="tabla-card">
+
+    <h4 class="section-title">
+        <i class="fa fa-handshake"></i>
+        Mantenedor del Proveedor
+    </h4>
+
+    <div class="form-group">
+
+        <div class="row mb-3">
+            <div class="col-md-12 text-end">
+                <button id="btnNuevoProveedor"
+                        type="button"
+                        class="btn btn-success"
+                        data-bs-toggle="modal"
+                        data-bs-target="#modalNuevoProveedor">
+                    <i class="fas fa-plus"></i> Nuevo Proveedor
+                </button>
+            </div>
+        </div>
+        <table id="tableroProveedor"
+               class="table table-hover table-bordered table-striped table-datatable-app"
+               width="100%">
+
+            <thead class="thead-app">
+            </thead>
+            <tbody></tbody>
+
+        </table>
+
+    </div>
+
+
+</div>
+
+
+<div class="modal fade" id="modalNuevoProveedor"
+     data-bs-backdrop="static"
+     data-bs-keyboard="false"
+     tabindex="-1" role="dialog" 
+     aria-labelledby="modalProveedorLabel" 
+     aria-hidden="true"
+>
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+
+            <!-- Cabecera del Modal -->
+            <div class="modal-header">
+                <div class="titulo-modal">
+                    <h2 class="mb-0">Proveedor</h2>
+                </div>
+                <button type="button"
+                        class="btn-close btn-close-white"
+                        data-bs-dismiss="modal"
+                        aria-label="Cerrar">
+                </button>
+            </div>
+
+
+
+            <!-- Formulario -->
+            <form id="formProveedor">
+
+
+                    <div class="tabla-card">
+
+                        <h4 class="section-title">
+                            <i class="fa fa-user"></i>
+                            Datos del Proveedor
+                        </h4>
+
+                        <div class="form-group">
+                            <label for="new_programaProveedor" class="label-formulario">Programa</label>
+                            <select id="new_programaProveedor" name="new_programaProveedor" class="form-control" required>
+                                <option value=""></option>
+                                <option value="0">PNAC-PACAM</option>
+                                <option value="1">PNI</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="new_rutProveedor" class="label-formulario">RUT Proveedor</label>
+                            <input id="new_rutProveedor" name="new_rut" type="text" class="form-control" placeholder="Sin puntos, sin guión y sin dígito verificador" required autocomplete="off">
+                        </div>
+                        <div class="form-group">
+                            <label for="new_nombreProveedor" class="label-formulario">Nombre Proveedor</label>
+                            <input id="new_nombreProveedor" name="new_nombreProveedor" type="text" class="form-control" placeholder="Nombres" required autocomplete="off">
+                        </div>
+                        <div class="form-group">
+                            <label for="new_direccionProveedor" class="label-formulario">Dirección Proveedor</label>
+                            <input id="new_direccionProveedor" name="new_direccionProveedor" type="text" class="form-control" placeholder="direccion" required autocomplete="off">
+                        </div>
+                        <div class="form-group">
+                            <label for="new_estadoProveedor" class="label-formulario">Estado</label>
+                            <select id="new_estadoProveedor" name="new_estadoProveedor" class="form-control" required>
+                                <option value="1">ACTIVO</option>
+                                <option value="0">INACTIVO</option>
+                            </select>
+                        </div>
+
+
+                    </div>
+
+
+                <!-- Pie del Modal -->
+                <div class="modal-footer">
+
+                    <button id="guardarNuevoProveedor" type="button" class="btn btn-primary">
+                        Guardar
+                    </button>
+
+                    <button id="modificarProveedor" type="button" class="btn btn-primary">
+                        Modificar
+                    </button>
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Cerrar</button>
+
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

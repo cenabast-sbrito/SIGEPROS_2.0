@@ -1,0 +1,101 @@
+﻿
+
+
+<div class="tabla-card">
+
+    <h4 class="section-title">
+        <i class="fa fa-archive"></i>
+        Historial
+    </h4>
+
+    <div class="form-group">
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="filtro-card">
+
+                    <h4 class="section-title">
+                        <i class="fa fa-filter"></i> Filtro
+                    </h4>
+
+                    <div class="row">
+
+                        <div class="col-lg-2">
+                            <label for="filtroHistorico_rutProveedor">
+                                Rut Proveedor
+                            </label>
+                            <input class="form-control"
+                                   id="filtroHistorico_rutProveedor"
+                                   type="text"
+                                   placeholder="Ingrese Rut, sin puntos, sin guion y sin dv">
+                        </div>
+
+                        <div class="col-lg-4">
+                            <label for="filtroHistorico_nombreProveedor">
+                                Proveedor
+                            </label>
+                            <select id="filtroHistorico_nombreProveedor" class="form-control js-placeholder-single busqueda-por-texto-seleccionFiltro2">
+
+                                <option value="">
+                                    Seleccione o busque una opción
+                                </option>
+
+                            </select>
+                        </div>
+
+                        <!-- Factura -->
+                        <div class="col-lg-2">
+                            <label for="filtroHistorico_Nfactura" class="labelFiltro">Factura</label>
+                            <input id="filtroHistorico_Nfactura"
+                                   class="form-control form-control-sm"
+                                   type="number" />
+                        </div>
+
+                        <div class="col-lg-2">
+                            <button id="btnFiltroConsultaHistorica"
+                                    type="button"
+                                    class="btn btn-primary btn-filtro">
+                                <i class="fa fa-search"></i>
+                                Aplicar Filtro
+                            </button>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+
+        <div class="panel panel-primary">
+
+@*             <div class="row">
+                <div class="titulo-principal">
+                    <h2>Historial</h2>
+                </div>
+            </div> *@
+
+            <table id="tableroHistorial"
+                   class="table table-hover table-bordered table-striped table-datatable-app"
+                   width="100%">
+
+                <thead class="thead-app"></thead>
+                <tbody></tbody>
+
+            </table>
+        </div>
+
+
+
+
+
+
+    </div>
+
+
+</div>
+
+
+
+
+

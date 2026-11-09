@@ -1,0 +1,90 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+
+
+
+<style>
+
+    /* oculto el input real */
+    #file-upload {
+        display: none;
+    }
+
+    .file-upload-container {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-top: 5px;
+    }
+
+    .file-upload-btn {
+        margin: 0;
+        padding: 10px 16px;
+        background: #006FB3;
+        color: #fff;
+       /* border-radius: 6px; */
+        cursor: pointer;
+        font-weight: 600;
+        transition: .2s;
+    }
+
+        .file-upload-btn:hover {
+            background: #005791;
+        }
+
+        .file-upload-btn i {
+            margin-right: 6px;
+        }
+
+    .file-upload-name {
+        color: #eee; /*#666;*/
+        font-size: 13px;
+        font-weight: 600;
+        padding: 7px;
+        border-bottom: 1px solid;
+        background: #343a40;
+    }
+
+</style>
+
+<script>
+
+    document.addEventListener("DOMContentLoaded", () => {
+
+                prov_getListProveedores('_rutProveedorCarga', '_nombreProveedorCarga');
+
+    });
+
+</script>
+
+<style>
+    .excel-preview {
+        display: flex;
+        overflow-x: auto;
+        border: 1px solid #ccc;
+        background: white;
+        padding: 10px;
+        gap: 2px;
+    }
+
+    .cell {
+        min-width: 140px;
+        border: 1px solid #d9d9d9;
+        padding: 10px;
+        text-align: center;
+        background: #fff;
+        font-size: 13px;
+    }
+
+    .required {
+        background: #fff2cc;
+        border: 2px solid #70ad47;
+        font-weight: bold;
+    }
+</style>
+
+
+<partial name="../PerfilAdministrador/_cargaDocumentos" />

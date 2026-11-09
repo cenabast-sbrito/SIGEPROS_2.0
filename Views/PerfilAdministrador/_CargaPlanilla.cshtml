@@ -1,0 +1,357 @@
+﻿<style>
+
+    /* oculto el input real */
+    #file-upload {
+        display: none;
+    }
+
+    .file-upload-container {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-top: 5px;
+    }
+
+    .file-upload-btn {
+        margin: 0;
+        padding: 10px 16px;
+        background: #006FB3;
+        color: #fff;
+        /* border-radius: 6px; */
+        cursor: pointer;
+        font-weight: 600;
+        transition: .2s;
+    }
+
+        .file-upload-btn:hover {
+            background: #005791;
+        }
+
+        .file-upload-btn i {
+            margin-right: 6px;
+        }
+
+    .file-upload-name {
+        color: #eee; /*#666;*/
+        font-size: 13px;
+        font-weight: 600;
+        padding: 7px;
+        border-bottom: 1px solid;
+        background: #343a40;
+    }
+
+</style>
+
+<script>
+
+    document.addEventListener("DOMContentLoaded", () => {
+
+                prov_getListProveedores('_rutProveedorCarga', '_nombreProveedorCarga');
+
+    });
+
+</script>
+
+<style>
+    .excel-preview {
+        display: flex;
+        overflow-x: auto;
+        border: 1px solid #ccc;
+        background: white;
+        padding: 10px;
+        gap: 2px;
+    }
+
+    .cell {
+        min-width: 140px;
+        border: 1px solid #d9d9d9;
+        padding: 10px;
+        text-align: center;
+        background: #fff;
+        font-size: 13px;
+    }
+
+    .required {
+        background: #fff2cc;
+        border: 2px solid #70ad47;
+        font-weight: bold;
+    }
+</style>
+
+
+<div class="excel-preview">
+    <div class="cell required">A Documento *</div>
+    <div class="cell required">B Pedido *</div>
+    <div class="cell">Grupo Artículo</div>
+    <div class="cell required">D Canal *</div>
+    <div class="cell required">E Material *</div>
+    <div class="cell">Fecha...</div>
+    <div class="cell required">G Fecha Entrega al OL *</div>
+    ...
+    <div class="cell required">M Factura *</div>
+    <div class="cell required">N Guía *</div>
+    ...
+    <div class="cell required">AA Centro *</div>
+</div>
+
+<div class="row">
+    <!-- SECCION: CARGA PLANILLA -->
+    <div class="col-md-7">
+
+        <div class="filtro-card">
+
+            <h4 class="section-title">
+                <i class="fa fa-upload"></i> Carga de Planilla ZDIS022
+            </h4>
+
+            <div class="col-lg-12" style="margin-bottom:30px;">
+
+                <label for="file-upload">
+                    Archivo
+                </label>
+
+                <div class="file-upload-container">
+
+                    <label for="file-upload" class="file-upload-btn">
+                        <i class="fa fa-file-excel-o"></i>
+                        Seleccionar archivo
+                    </label>
+
+                    <span id="nombreFile" class="file-upload-name">
+                        Ningún archivo seleccionado
+                    </span>
+
+                    <input id="file-upload"
+                           type="file"
+                           name="archivoExcel"
+                           accept=".xls,.xlsx,.csv" />
+
+                </div>
+
+            </div>
+
+
+
+            <form role="form" id="form-uploadPlanilla" method="POST" enctype="multipart/form-data" asp-action="UploadFile">
+
+                <div class="row">
+                    <partial name="../PerfilAdministrador/_proveedor" />
+@*                     <div class="col-lg-2">
+                        <label for="_rutProveedorCarga">
+                            Rut Proveedor
+                        </label>
+
+                        <input id="_rutProveedorCarga"
+                               name="_rutProveedorCarga"
+                               class="form-control"
+                               type="text" />
+                    </div>
+
+                    <div class="col-lg-4">
+                        <label for="_nombreProveedorCarga">
+                            Proveedor
+                        </label>
+
+                        <select id="_nombreProveedorCarga"
+                                name="_nombreProveedorCarga"
+                                class="form-control select2">
+                        </select>
+
+                        <input id="_dspNombreProveedor"
+                               type="hidden" />
+                    </div> *@
+
+                    <div class="col-lg-2">
+                        <label>
+                            Incluir período
+                        </label>
+
+                        <div>
+                            <input type="checkbox"
+                                   id="chkFiltroPeriodo" />
+                        </div>
+                    </div>
+
+                    <div class="col-lg-2">
+                        <label for="btnPeriodoCarga">
+                            Período Carga
+                        </label>
+
+                        <input id="btnPeriodoCarga"
+                               class="form-control"
+                               type="month" />
+                    </div>
+
+                </div>
+
+                <hr />
+
+                <div class="row">
+
+                    <div class="col-lg-9">
+
+                        <small class="text-muted">
+                            El archivo debe tener formato XLS, XLSX o CSV.
+                        </small>
+                    </div>
+
+                    <div class="col-lg-3">
+                        <label>&nbsp;</label>
+
+                        <button id="btnFileUploadPlanilla"
+                                type="submit"
+                                class="btn btn-primary btn-filtro">
+                            <i class="fa fa-upload"></i>
+                            Cargar Archivo
+                        </button>
+                    </div>
+
+                </div>
+
+                <div class="row mt-2">
+
+                    <div class="col-md-12">
+                        <span id="nombreFile"
+                              class="body-xs bold">
+                        </span>
+                    </div>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+    <!-- FIN SECCION: CARGA PLANILLA -->
+
+    <!-- SECCION: RESUMEN CARGA -->
+    <div class="col-md-5">
+
+        <div id="resumenCarga"
+             class="tabla-card">
+
+            <h4 class="section-title">
+                <i class="fa fa-list-alt"></i>
+                Resumen del Proceso de Carga
+            </h4>
+
+            <div id="spinnerCarga" class="text-center table-overlay" style="display:none; padding:20px">
+                <i class="fas fa-spinner fa-spin fa-3x"></i>
+                <div>Cargando Planilla...</div>
+            </div>
+
+            <table class="table table-bordered table-striped table-custom">
+
+                <tbody>
+
+                    <tr>
+                        <td><strong>Total de filas leídas</strong></td>
+                        <td id="resumeCountFacturas"></td>
+                    </tr>
+
+                    <tr>
+                        <td>Filas sin Factura</td>
+                        <td id="resume_count_filasSinFactura"></td>
+                    </tr>
+@*                     <tr>
+                        <td>Facturas distinta en SAP</td>
+                        <td id="resume_count_facturasNOSAP"></td>
+                    </tr> *@
+                    <tr>
+                        <td>Filas donde Pedido de Compra pertenece a otro Proveedor</td>
+                        <td id="resume_count_filasOtroProveedor"></td>
+                    </tr>
+
+                    <tr>
+                        <td>Filas fuera del período de carga</td>
+                        <td id="resume_count_filasFueraDelPeriodo"></td>
+                    </tr>
+
+                    <tr>
+                        <td>Filas cuyo canal no pertenece al programa</td>
+                        <td id="resume_count_filasOtroCanal"></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Total rechazadas</strong></td>
+                        <td id="resumeCountRechazos"></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Total filas aceptadas</strong></td>
+                        <td id="resumeCountFacturasAceptadas"></td>
+                    </tr>
+
+                </tbody>
+
+            </table>
+            <div id="resumeMessage"></div>
+
+        </div>
+
+
+        
+    </div>
+    <!-- FIN SECCION: RESUMEN CARGA -->
+</div>
+
+<!-- SECCION: CONSOLIDACION -->
+
+<div class="row">
+    <div class="col-md-12">
+
+        <div class="tabla-card">
+
+            <h4 class="section-title">
+                <i class="fa fa-folder-open"></i>
+                Gestión de Expedientes
+            </h4>
+
+            <form id="form-consolidar"
+                  method="POST"
+                  enctype="multipart/form-data">
+
+                <div class="mb-3" style="color: darkred;">
+
+                    <i class="fa fa-database"></i> Despliegue de datos en carga temporal. Debe revisar y consolidar la información.
+                    <button id="btnConsolidaCarga"
+                            type="submit"
+                            class="btn btn-primary">
+                        <i class="fa fa-check"></i>
+                        Consolidar
+                    </button>
+
+                </div>
+
+                <table id="tablaZDis022" class="table table-hover table-bordered table-striped table-datatable-app" width="100%">
+
+                    <thead class="thead-app">
+                        <tr>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+
+                </table>
+
+                <div class="row mt-3">
+
+                    <div class="col-md-8">
+
+                        <div class="accion_consolidar_mensaje"
+                             style="color: chocolate;"
+                             hidden>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+</div>
+
+<!-- FIN SECCION: CONSOLIDACION -->

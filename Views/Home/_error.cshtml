@@ -1,0 +1,51 @@
+﻿@inject Microsoft.AspNetCore.Hosting.IWebHostEnvironment env
+@{
+    ViewData["Title"] = "Acceso restringido";
+    var msjeError = ViewBag.MensajeError?.ToString();
+}
+
+<div class="container d-flex align-items-center justify-content-center min-vh-100">
+    <div class="card shadow-lg border-0" style="max-width: 520px;">
+        <div class="card-body text-center p-4">
+
+            <!-- Ícono / ilustración -->
+            <div class="mb-3">
+                <span class="material-symbols-outlined"
+                      style="font-size:64px; color:#dc3545;">
+                    lock
+                </span>
+            </div>
+
+            <h4 class="fw-bold mb-2">Acceso restringido</h4>
+            <p class="text-muted mb-3">
+                No es posible acceder a este sistema sin una sesión activa.
+            </p>
+
+            @if (!string.IsNullOrWhiteSpace(msjeError))
+            {
+                <div class="alert alert-danger d-flex align-items-center text-start" role="alert">
+                    <span class="material-symbols-outlined me-2">info</span>
+                    <div>@msjeError</div>
+                </div>
+            }
+
+            <hr />
+
+            <p class="small text-muted mb-4">
+                Si considera que esto es un error, contacte a desarrolloti@cenabast.cl.
+            </p>
+
+            <!-- Acciones -->
+            <div class="d-grid gap-2">
+
+                @* <a href="https://www.cenabast.cl"
+                   class="btn btn-outline-secondary">
+                    Volver al sitio institucional
+                </a> *@
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
